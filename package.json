@@ -1,0 +1,38 @@
+{
+  "name": "contact-management-api",
+  "version": "1.0.0",
+  "description": "Contact Management API built using Express JS",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "jest -i"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "keywords": [
+    "Express"
+  ],
+  "author": "Achmad Furqon Rachmadie",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.18.2",
+    "joi": "^17.12.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.23.9",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "prisma": "^5.9.1",
+    "supertest": "^6.3.4"
+  }
+}
