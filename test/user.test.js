@@ -2,30 +2,27 @@ import supertest from "supertest";
 import { prismaClient } from "../src/application/database.js";
 import { web } from "../src/application/web.js";
 import { logger } from "../src/application/logging.js";
+import { createUser, removeTestedUser } from "./test-util.js";
 
 
 describe('POST /api/users', () => {
     afterEach(async () => {
-        await prismaClient.user.deleteMany({
-            where: {
-                username: 'rchmd'
-            }
-        });
+        await removeTestedUser();
     });
 
     test('should register new user', async () => {
         const result = await supertest(web)
             .post('/api/users')
             .send({
-                username: "rchmd",
+                username: "test",
                 password: "secret",
-                name: "uqie rachmadie"
+                name: "test"
             });
 
         expect(result.status).toBe(200);
-        expect(result.body.data.username).toBe('rchmd');
+        expect(result.body.data.username).toBe('test');
         expect(result.body.data.password).toBeUndefined();
-        expect(result.body.data.name).toBe('uqie rachmadie');
+        expect(result.body.data.name).toBe('test');
 
     })
 
@@ -48,24 +45,24 @@ describe('POST /api/users', () => {
         let result = await supertest(web)
             .post('/api/users')
             .send({
-                username: "rchmd",
+                username: "test",
                 password: "secret",
-                name: "uqie rachmadie"
+                name: "test"
             });
 
         logger.info(result.body);
 
         expect(result.status).toBe(200);
-        expect(result.body.data.username).toBe('rchmd');
+        expect(result.body.data.username).toBe('test');
         expect(result.body.data.password).toBeUndefined();
-        expect(result.body.data.name).toBe('uqie rachmadie');
+        expect(result.body.data.name).toBe('test');
 
         result = await supertest(web)
             .post('/api/users')
             .send({
-                username: "rchmd",
+                username: "test",
                 password: "secret",
-                name: "uqie rachmadie"
+                name: "test"
             });
 
         logger.info(result.body);
@@ -74,4 +71,72 @@ describe('POST /api/users', () => {
         expect(result.body.errors).toBeDefined();
 
     })
+})
+
+describe('POST /api/users/login', () => {
+    beforeEach(async () => {
+        await createUser();
+    })
+
+    afterEach(async () => {
+        await removeTestedUser();
+    })
+
+    test('should logged in successfully', async () => {  
+        const result = await supertest(web)
+            .post('/api/users/login')
+            .send({
+                username: 'test', 
+                password: 'secret'
+            });
+
+            logger.info(result.body)
+        
+            expect(result.status).toBe(200);
+            expect(result.body.data.token).toBeDefined();
+            expect(result.body.data.token).not.toBe('test');
+    })
+    
+    test('should reject login req if req is invalid', async () => {  
+        const result = await supertest(web)
+            .post('/api/users/login')
+            .send({
+                username: '', 
+                password: ''
+            });
+
+            logger.info(result.body)
+        
+            expect(result.status).toBe(400);
+            expect(result.body.errors).toBeDefined();
+    })
+    
+    test('should reject login password is invalid', async () => {  
+        const result = await supertest(web)
+            .post('/api/users/login')
+            .send({
+                username: 'test', 
+                password: 'sss'
+            });
+
+            logger.info(result.body)
+        
+            expect(result.status).toBe(401);
+            expect(result.body.errors).toBeDefined();
+    })
+
+    test('should reject login username is invalid', async () => {  
+        const result = await supertest(web)
+            .post('/api/users/login')
+            .send({
+                username: 'fsfs', 
+                password: 'secret'
+            });
+
+            logger.info(result.body)
+        
+            expect(result.status).toBe(401);
+            expect(result.body.errors).toBeDefined();
+    })
+
 })
