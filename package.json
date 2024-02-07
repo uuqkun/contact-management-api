@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Contact Management API built using Express JS",
   "main": "src/main.js",
+  "type": "module",
   "scripts": {
     "test": "jest -i"
   },
@@ -17,6 +18,7 @@
   "author": "Achmad Furqon Rachmadie",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.9.1",
     "bcrypt": "^5.1.1",
     "express": "^4.18.2",
     "joi": "^17.12.1",
