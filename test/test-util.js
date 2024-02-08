@@ -1,4 +1,4 @@
-import { prismaClient } from "../src/application/database"
+import { prismaClient } from "../src/application/database.js"
 import bcrypt from "bcrypt"
 
 export const removeTestedUser = async () => {
@@ -18,4 +18,12 @@ export const createUser = async () => {
             token: "test"
         }
     })
+}
+
+export const getTestUser = async () => {
+    return prismaClient.user.findUnique({
+        where: {
+            username: 'test'
+        }
+    });
 }
