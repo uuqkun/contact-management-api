@@ -194,62 +194,92 @@ describe('PATCH /api/users/current', () => {
         await removeTestedUser();
     })
 
-    test('should update user', async () => {  
+    test('should update user', async () => {
         const result = await supertest(web)
-            .patch('/api/users/current') 
+            .patch('/api/users/current')
             .set("Authorization", 'test')
             .send({
-                name: 'uqie', 
+                name: 'uqie',
                 password: 'pass'
             });
 
-            expect(result.status).toBe(200);
-            expect(result.body.data.username).toBe('test');
-            expect(result.body.data.name).toBe('uqie');
+        expect(result.status).toBe(200);
+        expect(result.body.data.username).toBe('test');
+        expect(result.body.data.name).toBe('uqie');
 
-            const user = await getTestUser();
-            expect(await bcrypt.compare("pass", user.password)).toBe(true)
+        const user = await getTestUser();
+        expect(await bcrypt.compare("pass", user.password)).toBe(true)
 
     });
 
-    test('should only update user`s name', async () => {  
+    test('should only update user`s name', async () => {
         const result = await supertest(web)
-            .patch('/api/users/current') 
+            .patch('/api/users/current')
             .set("Authorization", 'test')
             .send({
                 name: 'uqie'
             });
 
-            expect(result.status).toBe(200);
-            expect(result.body.data.username).toBe('test');
-            expect(result.body.data.name).toBe('uqie');
+        expect(result.status).toBe(200);
+        expect(result.body.data.username).toBe('test');
+        expect(result.body.data.name).toBe('uqie');
     });
 
-    test('should only update user`s password', async () => {  
+    test('should only update user`s password', async () => {
         const result = await supertest(web)
-            .patch('/api/users/current') 
+            .patch('/api/users/current')
             .set("Authorization", 'test')
             .send({
                 password: 'useruser'
             });
 
-            expect(result.status).toBe(200);
-            expect(result.body.data.username).toBe('test');
-            expect(result.body.data.name).toBe('test');
+        expect(result.status).toBe(200);
+        expect(result.body.data.username).toBe('test');
+        expect(result.body.data.name).toBe('test');
 
-            const user = await getTestUser();
-            expect(await bcrypt.compare("useruser", user.password)).toBe(true)
+        const user = await getTestUser();
+        expect(await bcrypt.compare("useruser", user.password)).toBe(true)
     });
-    
-    test('should reject if sent invalid token', async () => {  
+
+    test('should reject if sent invalid token', async () => {
         const result = await supertest(web)
-            .patch('/api/users/current') 
+            .patch('/api/users/current')
             .set("Authorization", 'tokensalah')
             .send({
                 password: 'useruser'
             });
 
-            expect(result.status).toBe(401);
+        expect(result.status).toBe(401);
+    });
+});
+
+describe('DELETE /api/users/logout', () => {
+    beforeEach(async () => {
+        await createUser();
+    })
+
+    afterEach(async () => {
+        await removeTestedUser();
+    })
+
+    test('should be able to logout', async () => {
+        const result = await supertest(web)
+            .delete('/api/users/logout')
+            .set("Authorization", 'test');
+
+        expect(result.status).toBe(200);
+        expect(result.body.data).toBe("OK");
+
+        const user = await getTestUser();
+        expect(user.token).toBeNull();
+    });
+
+    test('should reject if invalid token', async () => {
+        const result = await supertest(web)
+            .delete('/api/users/logout')
+            .set("Authorization", 'wrong');
+
+        expect(result.status).toBe(401);
     });
 
 })
