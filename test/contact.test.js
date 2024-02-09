@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { createUser, removeAllTestContact, removeTestedUser } from "./test-util.js";
+import { createTestContact, createUser, getTestContact, removeAllTestContact, removeTestedUser } from "./test-util.js";
 import { web } from "../src/application/web.js";
 import { logger } from "../src/application/logging.js";
 
@@ -49,6 +49,53 @@ describe('POST /api/contacts', () => {
         
             expect(result.status).toBe(401);
             expect(result.error).toBeDefined();
-
      });
+});
+
+describe('GET /api/contacts/:contactId', () => {  
+    beforeEach(async () => {
+        await createUser();
+        await createTestContact();
+    });
+  
+    afterEach(async () => {
+        await removeAllTestContact();
+        await removeTestedUser();
+    });
+
+
+    test('should return contact data of a spesific user', async () => {  
+        const contactId = await getTestContact();
+
+        const result = await supertest(web)
+            .get(`/api/contacts/${contactId.id}`)
+            .set('Authorization', 'test');
+
+        expect(result.status).toBe(200);
+        expect(result.body.data.id).toBe(contactId.id);
+        expect(result.body.data.first_name).toBe(contactId.first_name);
+        expect(result.body.data.last_name).toBe(contactId.last_name);
+        expect(result.body.data.email).toBe(contactId.email);
+        expect(result.body.data.phone).toBe(contactId.phone);
+    })
+
+    test('should response error 404 if contactId not found', async () => {  
+        const contactId = await getTestContact();
+
+        const result = await supertest(web)
+            .get(`/api/contacts/${(contactId.id + 2)}`)
+            .set('Authorization', 'test');
+
+        expect(result.status).toBe(404);
+    })
+
+    test('should response error 401 if invalid token', async () => {  
+        const contactId = await getTestContact();
+
+        const result = await supertest(web)
+            .get(`/api/contacts/${contactId.id}`)
+            .set('Authorization', 'wrongtoken');
+
+        expect(result.status).toBe(401);
+    })
 });

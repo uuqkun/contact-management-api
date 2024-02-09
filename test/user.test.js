@@ -6,6 +6,9 @@ import { createUser, getTestUser, removeTestedUser } from "./test-util.js";
 import { log } from "winston";
 import bcrypt from "bcrypt";
 
+afterEach(async () => {
+    await removeTestedUser();
+})
 
 describe('POST /api/users', () => {
     afterEach(async () => {
@@ -20,6 +23,8 @@ describe('POST /api/users', () => {
                 password: "secret",
                 name: "test"
             });
+            
+        logger.info(result)
 
         expect(result.status).toBe(200);
         expect(result.body.data.username).toBe('test');
@@ -37,8 +42,6 @@ describe('POST /api/users', () => {
                 name: ""
             });
 
-        logger.info(result.body);
-
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
@@ -52,8 +55,6 @@ describe('POST /api/users', () => {
                 name: "test"
             });
 
-        logger.info(result.body);
-
         expect(result.status).toBe(200);
         expect(result.body.data.username).toBe('test');
         expect(result.body.data.password).toBeUndefined();
@@ -66,8 +67,6 @@ describe('POST /api/users', () => {
                 password: "secret",
                 name: "test"
             });
-
-        logger.info(result.body);
 
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
@@ -92,8 +91,6 @@ describe('POST /api/users/login', () => {
                 password: 'secret'
             });
 
-        logger.info(result.body)
-
         expect(result.status).toBe(200);
         expect(result.body.data.token).toBeDefined();
         expect(result.body.data.token).not.toBe('test');
@@ -107,8 +104,6 @@ describe('POST /api/users/login', () => {
                 password: ''
             });
 
-        logger.info(result.body)
-
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     })
@@ -121,8 +116,6 @@ describe('POST /api/users/login', () => {
                 password: 'sss'
             });
 
-        logger.info(result.body)
-
         expect(result.status).toBe(401);
         expect(result.body.errors).toBeDefined();
     })
@@ -134,8 +127,6 @@ describe('POST /api/users/login', () => {
                 username: 'fsfs',
                 password: 'secret'
             });
-
-        logger.info(result.body)
 
         expect(result.status).toBe(401);
         expect(result.body.errors).toBeDefined();
@@ -155,8 +146,6 @@ describe('GET /api/users/current', () => {
         const result = await supertest(web)
             .get('/api/users/current')
             .set('Authorization', 'test');
-
-        logger.info(result.body)
         logger.info(result)
 
         expect(result.status).toBe(200);
