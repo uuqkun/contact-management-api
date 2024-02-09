@@ -12,9 +12,9 @@ export const removeTestedUser = async () => {
 export const createUser = async () => {
     await prismaClient.user.create({
         data: {
-            username: "test", 
-            password: await bcrypt.hash('secret', 10), 
-            name: "test", 
+            username: "test",
+            password: await bcrypt.hash('secret', 10),
+            name: "test",
             token: "test"
         }
     })
@@ -22,6 +22,14 @@ export const createUser = async () => {
 
 export const getTestUser = async () => {
     return prismaClient.user.findUnique({
+        where: {
+            username: 'test'
+        }
+    });
+}
+
+export const removeAllTestContact = async () => {
+    return prismaClient.contact.deleteMany({
         where: {
             username: 'test'
         }
