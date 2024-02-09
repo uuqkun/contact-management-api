@@ -150,7 +150,7 @@ describe('PUT /api/contacts/:contactId', () => {
         expect(result.error).toBeDefined();
     });
 
-    test('should response 404 if user not found', async () => {
+    test('should response 400 if there`s empty field', async () => {
         const contactId = await getTestContact();
 
         const result = await supertest(web)
@@ -163,6 +163,42 @@ describe('PUT /api/contacts/:contactId', () => {
                 phone: ''
             });
 
-        logger.warn(result);
+        expect(result.status).toBe(400);
+        expect(result.error).toBeDefined();
     });
+});
+
+describe('DELETE /api/contacts/:contactId', () => {
+    beforeEach(async () => {
+        await createUser();
+        await createTestContact();
+    });
+
+    afterEach(async () => {
+        await removeAllTestContact();
+        await removeTestedUser();
+    });
+
+    test('should delete existing contact', async () => {
+        const contactId = await getTestContact();
+
+        const result = await supertest(web)
+            .delete(`/api/contacts/${contactId.id}`)
+            .set('Authorization', 'test');
+
+        expect(result.status).toBe(200);
+        expect(result.body.data).toBe("OK");
+    });
+
+    test('should reject if contact cannot be found', async () => {
+        const contactId = await getTestContact();
+
+        const result = await supertest(web)
+            .delete(`/api/contacts/${(contactId.id + 1)}`)
+            .set('Authorization', 'test');
+
+        expect(result.status).toBe(404);
+    });
+
+
 });

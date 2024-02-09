@@ -54,15 +54,15 @@ const update = async (user, request) => {
             id: contact.id
         }
     });
-    
+
     if (countInDatabase !== 1) throw new ResponseError(404, "User is Not Found");
-    
+
     return prismaClient.contact.update({
         where: {
             id: contact.id
         },
         data: {
-            first_name: contact.first_name, 
+            first_name: contact.first_name,
             last_name: contact.last_name,
             email: contact.email,
             phone: contact.phone,
@@ -77,8 +77,28 @@ const update = async (user, request) => {
     });
 }
 
+const remove = async (user, contactId) => {
+    contactId = validate(getContactValidation, contactId);
+
+    const countInDatabase = await prismaClient.contact.count({
+        where: {
+            username: user.username,
+            id: contactId
+        }
+    });
+
+    if (countInDatabase !== 1) throw new ResponseError(404, "User is Not Found");
+
+    return prismaClient.contact.delete({
+        where: {
+            id: contactId
+        }
+    });
+}
+
 export default {
     create,
     get,
-    update
+    update,
+    remove
 }
