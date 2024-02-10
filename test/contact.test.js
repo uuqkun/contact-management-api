@@ -1,7 +1,8 @@
 import supertest from "supertest";
-import { createManyTestContact, createTestContact, createUser, getTestContact, removeAllTestContact, removeTestedUser } from "./test-util.js";
+import { createManyTestContact, createTestContact, createUser, getTestContact, removeAllTestAddresses, removeAllTestContact, removeTestedUser } from "./test-util.js";
 import { web } from "../src/application/web.js";
 import { logger } from "../src/application/logging.js";
+
 
 describe('POST /api/contacts', () => {
 
