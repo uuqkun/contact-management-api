@@ -1,7 +1,7 @@
 import { prismaClient } from "../application/database.js";
 import { logger } from "../application/logging.js";
 import { ResponseError } from "../error/error.js";
-import { createAddressValidation, getAddressValidation } from "../validation/address-validation.js";
+import { createAddressValidation, getAddressValidation, updateAddressValidation } from "../validation/address-validation.js";
 import { getContactValidation } from "../validation/contact-validation.js";
 import { validate } from "../validation/validation.js"
 
@@ -9,7 +9,7 @@ import { validate } from "../validation/validation.js"
 const checkContactMustAvailableInDb = async (user, contactId) => {
     // validate incoming contactId
     contactId = await validate(getContactValidation, contactId);
-    
+
     // check contact availability
     const countInDatabase = await prismaClient.contact.count({
         where: {
@@ -17,7 +17,7 @@ const checkContactMustAvailableInDb = async (user, contactId) => {
             id: contactId
         }
     });
-    
+
     if (countInDatabase !== 1) {
         throw new ResponseError(404, "Contact is Not Found");
     }
@@ -55,11 +55,11 @@ const get = async (user, contactId, addressId) => {
 
     const address = await prismaClient.address.findFirst({
         where: {
-            id: addressId, 
+            id: addressId,
             contact_id: contactId
         },
         select: {
-            id: true, 
+            id: true,
             street: true,
             city: true,
             province: true,
@@ -74,10 +74,48 @@ const get = async (user, contactId, addressId) => {
     }
 
     return address;
-
 }
+
+const update = async (user, contactId, request) => {
+    contactId = await checkContactMustAvailableInDb(user, contactId);
+
+    const address = validate(updateAddressValidation, request);
+
+    const addressCount = await prismaClient.address.count({
+        where: {
+            id: address.id,
+            contact_id: contactId
+        }
+    });
+    
+    if (addressCount !== 1) {
+        throw new ResponseError(404, "Address is not found");
+    }
+
+    return prismaClient.address.update({
+        where: {
+            id: address.id,
+        },
+        data: {
+            street: request.street,
+            city: request.city,
+            province: request.province,
+            country: request.country,
+            postal_code: request.postal_code,
+        },
+        select: {
+            id: true,
+            street: true,
+            city: true,
+            province: true,
+            country: true,
+            postal_code: true
+        }
+    });
+};
 
 export default {
     create,
-    get
+    get,
+    update
 }

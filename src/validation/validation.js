@@ -3,7 +3,7 @@ import { ResponseError } from "../error/error.js";
 const validate = (schema, request) => {
     const result = schema.validate(request, {
         abortEarly: false, 
-        allowUnknown: false
+        allowUnknown: true,
     });
 
     if (result.error) {
