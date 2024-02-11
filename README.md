@@ -20,6 +20,8 @@
 
 The Contact Management API is a web service designed for managing user contacts. It provides functionalities for user registration, login, updating user information, reading user data, and logging out. Additionally, it supports contact-related features such as creating contacts, retrieving contact information, updating contacts, searching for contacts based on name, email, or phone, and deleting contacts. Furthermore, the API includes address-related features like creating addresses, updating addresses, retrieving address data, deleting addresses, and obtaining a list of addresses associated with a specific contact.
 
+***See [/contact-management-api/docs](/docs/) for further details about API specs***
+
 ## User Features
 
 1. **Registration**
@@ -101,4 +103,4 @@ The Contact Management API is a web service designed for managing user contacts.
     - Method: `GET`
     - Description: Retrieves a list of addresses associated with a specific contact.
 
-Feel free to use this documentation as a reference for implementing or interacting with the Contact Management API.
+*Feel free to use this documentation as a reference for implementing or interacting with the Contact Management API.*
