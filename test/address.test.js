@@ -89,7 +89,6 @@ describe('POST /api/contacts/:contactId/addresses', () => {
                 postal_code: ''
             });
 
-        logger.info(result)
         expect(result.status).toBe(400);
         expect(result.error).toBeDefined();
     });
@@ -271,3 +270,64 @@ describe('POST /api/contacts/:contactId/addresses/:addressId', () => {
         expect(result.status).toBe(401);
     });
 });
+
+
+describe('DELETE /api/contacts/:contactId/addresses/:addressId', () => {  
+    beforeEach(async () => {
+        await createUser();
+        await createTestContact();
+        await createTestAddress();
+    });
+
+    afterEach(async () => {
+        await removeAllTestAddresses();
+        await removeAllTestContact();
+        await removeTestedUser();
+    });
+
+    test('should delete existing address', async () => {  
+        const address = await getTestAddress();
+        const contact = await getTestContact();
+        
+        const result = await supertest(web)
+            .delete(`/api/contacts/${contact.id}/addresses/${address.id}`)
+            .set('Authorization', 'test');
+
+            expect(result.status).toBe(200);
+            expect(result.body.data).toBe("OK");
+    });
+
+    test('should response 404 if contact is not found', async () => {  
+        const address = await getTestAddress();
+        const contact = await getTestContact();
+        
+        const result = await supertest(web)
+            .delete(`/api/contacts/${(contact.id * 2)}/addresses/${address.id}`)
+            .set('Authorization', 'test');
+
+            logger.warn(result);
+            expect(result.status).toBe(404);
+    });
+
+    test('should response 404 if address not found', async () => {  
+        const address = await getTestAddress();
+        const contact = await getTestContact();
+        
+        const result = await supertest(web)
+            .delete(`/api/contacts/${contact.id}/addresses/${(address.id * 2)}`)
+            .set('Authorization', 'test');
+
+            expect(result.status).toBe(404);
+    });
+
+    test('should response 401 if user unauthorized', async () => {  
+        const address = await getTestAddress();
+        const contact = await getTestContact();
+        
+        const result = await supertest(web)
+            .delete(`/api/contacts/${contact.id}/addresses/${address.id}`)
+            .set('Authorization', '');
+
+            expect(result.status).toBe(401);
+    });
+})  

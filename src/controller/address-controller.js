@@ -38,7 +38,7 @@ const update = async (req, res, next) => {
         const addressId = req.params.addressId;
         const contactId = req.params.contactId;
         const request = req.body;
-        request.id = addressId     
+        request.id = addressId
 
         const result = await addressService.update(user, contactId, request);
 
@@ -50,8 +50,25 @@ const update = async (req, res, next) => {
     }
 }
 
+const remove = async (req, res, next) => {
+    try {
+        const user = req.user;
+        const contactId = req.params.contactId;
+        const addressId = req.params.addressId;
+
+        await addressService.remove(user, contactId, addressId);
+
+        res.status(200).json({
+            data: "OK"
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
 export default {
     create,
     get,
-     update
+    update,
+    remove
 }
