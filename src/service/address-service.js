@@ -134,13 +134,38 @@ const remove = async (user, contactId, addressId) => {
             id: addressId,
             contact_id: contactId
         }
-    });
-    
+    });   
 }
+
+const list = async (user, contactId) => {
+    // check contact availability
+    contactId = await checkContactMustAvailableInDb(user, contactId);
+
+    const addresses = await prismaClient.address.findMany({
+        where: {
+            contact_id: contactId
+        },
+        select: {
+            id: true,
+            street: true,
+            city: true,
+            province: true,
+            country: true,
+            postal_code: true
+        }
+    });
+
+    if (addresses.length < 1) {
+        throw new ResponseError(403, "No addresses registered to this contact");
+    }
+
+    return addresses;
+} 
 
 export default {
     create,
     get,
     update,
-    remove
+    remove,
+    list
 }
